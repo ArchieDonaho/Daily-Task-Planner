@@ -40,3 +40,7 @@ textarea{
   filter: invert(1);
   transition: all .05s ease-in-out;
 }
+
+.time-task {
+  font-size: 30px;
+}

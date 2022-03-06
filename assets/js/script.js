@@ -13,14 +13,29 @@ var setStatus = function() {
 //check the status of the hour
 var checkStatus = function(){
     //create an array for each time block
-    var timeBlockArray = jQuery.makeArray($(".time-task"));
+    var timeBlockArray = jQuery.makeArray($(".time-block"));
+    
+    //create a variable for the current hour
+    var currentTime = moment().format("H");
     
     //compare each time value to the current time
-    var currentTime = moment().format("ha")
-    console.log(currentTime);
-    console.log(currentTime == "11am")
+    //loop through the timeblockarray array
+    $.each(timeBlockArray, function(index, item){
+        // console.log($(timeBlockArray[index]).attr('id'));
 
-    
+        if(currentTime > ($(timeBlockArray[index]).attr('id'))){
+            // console.log("the current time is after");
+            $(timeBlockArray[index]).addClass("bg-secondary");
+        } 
+        else if(currentTime == ($(timeBlockArray[index]).attr('id'))){
+            // console.log("the current time is now");
+            $(timeBlockArray[index]).addClass("bg-warning");
+        } 
+        else if(currentTime < ($(timeBlockArray[index]).attr('id'))){
+            // console.log("the current time is before");
+            $(timeBlockArray[index]).addClass("bg-success");
+        }
+    })
 }
 
 var createEvents = function(index, item){
@@ -35,12 +50,10 @@ var createEvents = function(index, item){
 var loadEvents = function(){
     //load the events back into the array
     myEvents = JSON.parse(localStorage.getItem("events"));
-    console.log("accessed load");
 
     //if there is no events saved, generate a new event
     if(!myEvents){
         myEvents = [];
-        console.log("empty array");
     }
 
     // for each index in the array...
@@ -60,9 +73,10 @@ var saveEvents = function(){
 
 
 //edit the task by clicking the textbox
-$(".time-block").on("click", ".col-10", function(){
+$(".time-block").on("click", ".time-task", function(){
     //retireve the current text
     var text = $(this).text().trim();
+    console.log("text retrieved: " + text);
     
     //create a textarea class
     var textInput = $("<textarea>");
@@ -74,14 +88,15 @@ $(".time-block").on("click", ".col-10", function(){
     //add focus to the box automatically
     textInput.trigger("focus");
 });
-//upon leaving the textbox, revert it back into a div
-$(".time-block").on("blur", ".col-10", function(){
+//upon leaving the textarea, revert it back into a div
+$(".time-block").on("blur", "textarea", function(){
     //retireve the newly added text
     var text = $(this).val().trim();
+    console.log("text added: " + text);
 
     //create the div class
     var container = $("<div>");
-    container.addClass("col-10").text(text);
+    container.addClass("col-10 time-task d-flex justify-content-center align-items-center").text(text);
 
     //replace the textarea with the newly added text
     $(this).replaceWith(container);
@@ -91,12 +106,8 @@ $(".time-block").on("blur", ".col-10", function(){
 //save the task upon clicking the save icon
 $(".time-block").on("click", "img", function(){
     // obtain the textbox
-    var textBlock = $(this).parent().siblings(".col-10");
-
-    // //get the id of the textbox
-    // var data = textBlock.attr('id');
-    // console.log("the id is: " + data);
-
+    var textBlock = $(this).parent().siblings(".time-task");
+    console.log(textBlock.text());
     //get the text within the textbox
     var task = textBlock.text();
     console.log("the task is " + task);
@@ -110,6 +121,10 @@ $(".time-block").on("click", "img", function(){
 
     //then save the array
     saveEvents();
+
+    
+    checkStatus();
+
 });
 
 //load the task upon page load
